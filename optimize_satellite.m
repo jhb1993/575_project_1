@@ -43,19 +43,26 @@ function [xopt, fopt, exitflag, output] = optimize_satellite()
         liq_h_cost = 4;         %cost for liquid hydrogen fuel ($/kg)
         liq_oxy_cost = 0.20;    %cost for liquid oxygen fuel ($/kg)
         h_oxy_ratio = 5.5;      %ratio for 
+        panel_thick = .5;       %Panel thickness in, guess (m)
+        panel_const = .00338;   %Panel converstion from huble (m2/W) 
+        
+        
         
         %analysis functions
         revenue_gps = sqrt(gps_vol);        %revenue from gps ($)
-        revenue_camera = sqrt(camera_vol);  %revenue from camera ($)
+        revenue_camera = -.0007*camera_vol^5+.186*camera_vol^4-20.494*camera_vol^3+1099.7*camera_vol^2-283658*camera_vol+280822;  %revenue from camera ($)
         revenue_comms = sqrt(comms_vol);    %revenue from comms ($)
         
         revenue_total = revenue_gps + revenue_camera + revenue_comms;
         
+        power_gen = panel_vol/(panel_thick*panel_const); %Power generated from Solar Panels (W)
+        
         %objective function
-        f = revenue_total;
+        f = revenue_total; %Maximize
         
         %inequality constraints
         c = [];
+        c(1) = power_cam + power_gps + power_comms - power_gen;     %Total Power <= Power_gen;
         
         %equality constraints
         ceq = [];
