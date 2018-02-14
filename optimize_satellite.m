@@ -16,10 +16,10 @@ function [xopt, fopt, exitflag, output] = optimize_satellite()
     %   camera_vol- size of camera equipment (m^3)
     %   comms_vol- size of communications equipment (m^3)
     %   panel_vol- size of solar panels (m^3)
-    
-    x0 = [2;2;2;2];
-    ub = [3;3;3;3];
-    lb = [1;1;1;1];
+         % gps, cam, comms, panel
+    x0 = [10;50;15;20];
+    ub = [50;100;30;40];
+    lb = [5;10;5;2];
 
     % ------------Linear constraints------------
     A = [];
@@ -43,16 +43,18 @@ function [xopt, fopt, exitflag, output] = optimize_satellite()
         comms_init_cost = 30;   %analogous to manufacture cost ($/m^3)
         panel_init_cost = 10;   %This value has not been checked for rationality
         
+        %payload fairing properties
+        r_fairing = 4.572/2;
+        h_cylinder = 7.631;
+        h_cone = 5.296;
+        
+        
         %% Placeholders:
-         max_volume=9;
-         max_weight=12;
-         max_cost=1000;
+         max_volume=pi*r_fairing^2*h_cylinder+pi/3*r_fairing^2*h_cone;
+         max_weight=8900; %Max payload cap from wiki (kg)
+         max_cost=100000000;
         %%
 		
-        liq_h_cost = 4;         %cost for liquid hydrogen fuel ($/kg)
-        liq_oxy_cost = 0.20;    %cost for liquid oxygen fuel ($/kg)
-        h_oxy_ratio = 5.5;      %ratio for fuel
-        i_sp = 450;             %specific impulse of fuel
         panel_thick = .5;       %Panel thickness in, guess (m)
         panel_const = .00338;   %Panel converstion from huble (m2/W) 
         
@@ -97,10 +99,15 @@ function [xopt, fopt, exitflag, output] = optimize_satellite()
         
         net_profit=revenue_total-costs_total;
         
+        
+        
+        power_camera = 2*camera_vol;
+        power_comms = .0005*comms_vol^3-.0497*comms_vol^2+1.5122*comms_vol - .981;
+        power_gps = -.0018*gps_vol^3+.0703*gps_vol^2-.1371*gps_vol+.8088;
         power_gen = panel_vol/(panel_thick*panel_const); %Power generated from Solar Panels (W)
         
         %objective function
-        f =  net_profit;
+        f =  -net_profit; %Maximize
                
         %inequality constraints: c<=0
         
@@ -112,8 +119,9 @@ function [xopt, fopt, exitflag, output] = optimize_satellite()
         c(1)=-max_volume+total_vol;
         c(2)=-max_weight+total_weight;
         c(3)=-max_cost+costs_total;
+        c(4)= power_camera+power_comms+power_gps-power_gen; % Power consumed <= power gen
         
-        f = revenue_total; %Maximize
+%         f = revenue_total; 
         
         
         %equality constraints
@@ -125,7 +133,10 @@ function [xopt, fopt, exitflag, output] = optimize_satellite()
     options = optimoptions(@fmincon, 'display', 'iter-detailed');
     [xopt, fopt, exitflag, output] = fmincon(@obj, x0, A, b, Aeq, beq, lb, ub, @con, options);
     
-    
+    xopt
+    fopt
+
+    objcon(xopt)
     % ------------Separate obj/con (do not change)------------
     function [f] = obj(x)
             [f, ~, ~] = objcon(x);

@@ -27,7 +27,8 @@ else
     overuse_penalty=0;
 end
 
-revenue=gps_rev+camera_rev+comms_rev-overuse_penalty;
+% revenue=gps_rev+camera_rev+comms_rev-overuse_penalty;
+revenue=(gps_rev+camera_rev+comms_rev-overuse_penalty)*1000;
 
 end
 

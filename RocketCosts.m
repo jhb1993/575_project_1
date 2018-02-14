@@ -17,8 +17,8 @@ function [cost] = RocketCosts(total_weight)
     
     mass_propellant = mo-mf;
     
-    mass_liq_oxy = mass_propellant/6.5;
-    mass_liq_h = 5.5*mass_liq_oxy;
+    mass_liq_oxy = mass_propellant/(h_oxy_ratio+1);
+    mass_liq_h = h_oxy_ratio*mass_liq_oxy;
     
     cost=liq_h_cost*mass_liq_h + liq_oxy_cost*mass_liq_oxy;  %placeholder
 
