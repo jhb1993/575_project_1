@@ -51,7 +51,8 @@ function [xopt, fopt, exitflag, output] = optimize_satellite()
 		
         liq_h_cost = 4;         %cost for liquid hydrogen fuel ($/kg)
         liq_oxy_cost = 0.20;    %cost for liquid oxygen fuel ($/kg)
-        h_oxy_ratio = 5.5;      %ratio for 
+        h_oxy_ratio = 5.5;      %ratio for fuel
+        i_sp = 450;             %specific impulse of fuel
         panel_thick = .5;       %Panel thickness in, guess (m)
         panel_const = .00338;   %Panel converstion from huble (m2/W) 
         
@@ -74,7 +75,7 @@ function [xopt, fopt, exitflag, output] = optimize_satellite()
         %%I think that the revenue calculations will be best done in a
         %%single function; some of them may be interdependent. For
         %%instance, I'm very concerned with how we will allocate power to
-        %%the different modules. It seems like that could get complicted.
+        %%the different modules. It seems like that could get complicated.
         %%TBN
 
         revenue_total = SatelliteRevenue(gps_vol,camera_vol,comms_vol,panel_vol,max_volume);
