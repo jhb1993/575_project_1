@@ -35,27 +35,71 @@ function [xopt, fopt, exitflag, output] = optimize_satellite()
         camera_vol = x(2);
         comms_vol = x(3);
         panel_vol = x(4);
+        total_vol=gps_vol+camera_vol+comms_vol+panel_vol;
         
         %other analysis variables
         gps_init_cost = 25;     %analogous to manufacture cost ($/m^3)
         camera_init_cost = 40;  %analogous to manufacture cost ($/m^3)
         comms_init_cost = 30;   %analogous to manufacture cost ($/m^3)
-        liq_h_cost = 4;         %cost for liquid hydrogen fuel ($/kg)
-        liq_oxy_cost = 0.20;    %cost for liquid oxygen fuel ($/kg)
-        h_oxy_ratio = 5.5;      %ratio for 
+        panel_init_cost = 10;   %This value has not been checked for rationality
         
-        %analysis functions
-        revenue_gps = sqrt(gps_vol);        %revenue from gps ($)
-        revenue_camera = sqrt(camera_vol);  %revenue from camera ($)
-        revenue_comms = sqrt(comms_vol);    %revenue from comms ($)
+        %% Placeholders:
+         max_volume=9;
+         max_weight=12;
+         max_cost=1000;
+        %%
         
-        revenue_total = revenue_gps + revenue_camera + revenue_comms;
+        gps_density = 1;
+        camera_density = 1.1;
+        comms_density = 1.3;
+        panel_density = 1.7; 
+        superstructure_density = 1; %Presumably, the volume of superstructure
+        %necessary will depend on the volume of the cargo we are
+        %transporting. This will be expressed as a density of
+        %superstructure per volume. TBN
+        
+        
+        %%analysis functions
+        
+        %%I think that the revenue calculations will be best done in a
+        %%single function; some of them may be interdependent. For
+        %%instance, I'm very concerned with how we will allocate power to
+        %%the different modules. It seems like that could get complicted.
+        %%TBN
+
+        revenue_total = SatelliteRevenue(gps_vol,camera_vol,comms_vol,panel_vol,max_volume);
+        
+        gps_weight = gps_vol*gps_density;
+        camera_weight = camera_vol*camera_density;
+        comms_weight = comms_vol*comms_density;
+        panel_weight = panel_vol*panel_density; 
+        structure_weight = total_vol*superstructure_density;
+        total_weight=gps_weight+camera_weight+comms_weight+panel_weight...
+            +structure_weight;
+        
+        costs_comms = comms_init_cost*comms_vol;
+        costs_gps = gps_init_cost*gps_vol;
+        costs_camera=camera_init_cost*camera_vol;
+        costs_panel = panel_init_cost*panel_vol;
+        costs_fuel = RocketCosts(total_weight); %JHB mentioned he had this.
+        costs_total=costs_comms+costs_gps+costs_camera+costs_panel+costs_fuel;
+        
+        net_profit=revenue_total-costs_total;
         
         %objective function
-        f = revenue_total;
+        f =  net_profit;
+               
+        %inequality constraints: c<=0
         
-        %inequality constraints
-        c = [];
+        %1. Total volume must be below some maximum value;
+        %2. Total weight must be below some maximum value;
+        %3. Total costs must be below some maximum value;
+        
+        c = zeros(3,1);
+        c(1)=-max_volume+total_vol;
+        c(2)=-max_weight+total_weight;
+        c(3)=-max_cost+costs_total;
+        
         
         %equality constraints
         ceq = [];
