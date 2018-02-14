@@ -1,5 +1,9 @@
 function [revenue] = SatelliteRevenue(gps_vol,camera_vol,comms_vol,panel_vol,total_vol_limit)
 
+% %         Cameron's proposed valuations that I found after making these:
+% %         revenue_gps = sqrt(gps_vol);        %revenue from gps ($)
+% %         revenue_camera = -.0007*camera_vol^5+.186*camera_vol^4-20.494*camera_vol^3+1099.7*camera_vol^2-283658*camera_vol+280822;  %revenue from camera ($)
+% %         revenue_comms = sqrt(comms_vol);
 
 gps_rev = 500-500^(-gps_vol/total_vol_limit);           %Sale value of data
 gps_energy = gps_vol/total_vol_limit*1.3;               %Power cost of module
