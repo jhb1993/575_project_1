@@ -30,9 +30,12 @@ for i=2:length(gps_rev)
 end
 total_gps_rev=NPV(gps_rev);
 
+%% Camera revenues are presumed to have an exponential growth pattern
+%%(a larger camera is much better than a few smaller ones). 
+
 %placeholder
 camera_rev=zeros(15,1);
-camera_rev(1) = 60*10^6-(60*10^6)^(-camera_vol/(camera_vol_limit*.3));
+camera_rev(1) = 60*10^6-(60*10^6)^(-camera_vol/(camera_vol_limit*.6));
 
 
 for i=2:length(camera_rev)

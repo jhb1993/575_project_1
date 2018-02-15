@@ -18,10 +18,11 @@ Kgps=31.25*10^6;
 Agps=(Kgps-10^2)/10^2;                
 %A is a term based on K and the initial profits of any functional comms
 %satellite, which we estimate to be 10,000 per year.
-kgps = -50;
+kgps = -40;
 %K is a scaling factor.
 
-norm_gps_vol=gps_vol/gps_vol_limit;
+norm_gps_vol=gps_vol/(10);      %Current GPS satellites are approx 10m^3
+                %http://www.boeing.com/space/global-positioning-system/
 
 gps_rev(1) = Kgps/(1+Agps*exp(kgps*norm_gps_vol));
 for i=2:length(gps_rev)
@@ -30,13 +31,16 @@ for i=2:length(gps_rev)
 end
 total_gps_rev=NPV(gps_rev);
 
+%% Camera revenues are presumed to have a quadratic growth pattern
+%%(a larger camera is much better than a few smaller ones). 
+
 %placeholder
 camera_rev=zeros(15,1);
-camera_rev(1) = 60*10^6-(60*10^6)^(-camera_vol/(camera_vol_limit*.6));
+camera_rev(1) = 30*10^3*(5*camera_vol/(camera_vol_limit))^(3);
 
 
 for i=2:length(camera_rev)
-    camera_rev(i)=camera_rev(1)*exp(-i*.05);
+    camera_rev(i)=camera_rev(1)*exp(-i*.15);
     %Value of the camera decays according to some function. This is just a
     %placeholder for Cameron's version of that function.
 end
@@ -52,12 +56,12 @@ Kcomms=100*10^6;
 %It is estimated as approx 100 million using this website.
 %https://www.sia.org/wp-content/uploads/2017/07/SIA-SSIR-2017.pdf
 
-Acomms=(Kcomms-10^3)/10^3;                
+Acomms=(Kcomms-10^2)/10^2;                
 %A is a term based on K and the initial profits of any functional comms
 %satellite, which we estimate to be 1,000 per year.
 kcomms = -10;
 %K is a scaling factor.
-norm_coms_vol=comms_vol/(comms_vol_limit*.75);
+norm_coms_vol=comms_vol/(35);
 %this normalizes the equation.
 comms_rev(1) = Kcomms/(1+Acomms*exp(kcomms*norm_coms_vol));    
 %Find initial value for comms revenue.
@@ -70,6 +74,10 @@ total_comms_rev=NPV(comms_rev);
 %% End of Comms section.
 
 revenue=(total_gps_rev+total_camera_rev+total_comms_rev);
+
+% % if (revenue>10^6)
+% %     disp 'check'
+% % end
 
 end
 

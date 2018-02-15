@@ -17,9 +17,9 @@ function [xopt, fopt, exitflag, output] = optimize_satellite()
     %   comms_vol- size of communications equipment (m^3)
     %   panel_vol- size of solar panels (m^3)
          % gps, cam, comms, panel
-    x0 = [10;50;15;20];
-    ub = [50;100;150;40];
-    lb = [5;5;5;2];
+    x0 = [10;10;10;20];
+    ub = [50;100;150;150];
+    lb = [1;1;1;2];
 
     % ------------Linear constraints------------
     A = [];
@@ -38,15 +38,15 @@ function [xopt, fopt, exitflag, output] = optimize_satellite()
         total_vol=gps_vol+camera_vol+comms_vol+panel_vol;
         
         %other analysis variables
-        gps_init_cost = 25;     %analogous to manufacture cost ($/m^3)
-        camera_init_cost = 40;  %analogous to manufacture cost ($/m^3)
-        comms_init_cost = 30;   %analogous to manufacture cost ($/m^3)
-        panel_init_cost = 10;   %This value has not been checked for rationality
+        gps_init_cost = 2500;     %analogous to manufacture cost ($/m^3)
+        camera_init_cost = 4000;  %analogous to manufacture cost ($/m^3)
+        comms_init_cost = 3000;   %analogous to manufacture cost ($/m^3)
+        panel_init_cost = 1000;   %This value has not been checked for rationality
         
         %payload fairing properties
-        r_fairing = 4.572/2;    %From the Atlas V Payload fairing
-        h_cylinder = 7.631;     %From the Atlas V Payload fairing
-        h_cone = 5.296;         %From the Atlas V Payload fairing
+        r_fairing = 4.572/2;    %radius from the Atlas V Payload fairing
+        h_cylinder = 7.631;     %height from the Atlas V Payload fairing
+        h_cone = 5.296;         %height from the Atlas V Payload fairing
         
         
         %% Placeholders:
@@ -58,7 +58,7 @@ function [xopt, fopt, exitflag, output] = optimize_satellite()
         panel_thick = .05;       %Panel thickness in, guess (m).
         %This value seems reasonable after looking at https://ntrs.nasa.gov/archive/nasa/casi.ntrs.nasa.gov/19710028154.pdf
         
-        panel_const = .00338;   %Panel converstion from Hubble (m2/W) 
+        panel_const = .00338;   %Panel conversion from Hubble (m2/W) 
         slope_power_cam = 4000; %m^3/W
         slope_power_comm = 1500; %m^3/W
         slope_power_gps = 750; %m^3/W
@@ -66,14 +66,14 @@ function [xopt, fopt, exitflag, output] = optimize_satellite()
         
         %analysis functions
         
-        gps_density = 240;
-        camera_density = 285; %(kg/m^3) Hubble Space telescope weighs 11000 kilos and is approx. 13.3 m by 4 m.
-        comms_density = 200;
-        panel_density = 100; 
-        superstructure_density = 100; %Presumably, the volume of superstructure
-        %necessary will depend on the volume of the cargo we are
-        %transporting. This will be expressed as a density of
-        %superstructure per volume. TBN
+        gps_density = 163;      %(kg/m^3) http://www.boeing.com/space/global-positioning-system/
+        camera_density = 170;   %(kg/m^3) Hubble Space telescope weighs 11000 kilos and is approx. 13.3 m by 5 m.
+        comms_density = 160;    %(kg/m^3) Inmarsat-4 F3 guesses from https://www.satbeams.com/satellites?norad=33278 and pictures
+        panel_density = 8;     %(kg/m^3) http://sunmetrix.com/is-my-roof-suitable-for-solar-panels-and-what-is-the-weight-of-a-solar-panel/
+                        %This source is for roof-based panels, which will
+                        %probably weigh a bit more than space panels.
+        superstructure_density = 0; %Presumably, superstructure weight has
+        %already been subtracted from payload weight. TBN
         
         
         %%analysis functions
@@ -83,17 +83,12 @@ function [xopt, fopt, exitflag, output] = optimize_satellite()
         %%instance, I'm very concerned with how we will allocate power to
         %%the different modules. It seems like that could get complicated.
         %%TBN
-        
-        %Placeholders:
-        gps_vol_limit=1.542626329854172e+02/3;
-        camera_vol_limit=1.542626329854172e+02/3;
-        comms_vol_limit=1.542626329854172e+02/3;
-        
-        max_Vcam = max_sensor_volume(slope_power_cam, panel_const, panel_thick, max_volume)
-        max_Vcomms = max_sensor_volume(slope_power_comm, panel_const, panel_thick, max_volume)
-        max_Vgps = max_sensor_volume(slope_power_gps, panel_const, panel_thick, max_volume)
+                
+        max_Vcam = max_sensor_volume(slope_power_cam, panel_const, panel_thick, max_volume);
+        max_Vcomms = max_sensor_volume(slope_power_comm, panel_const, panel_thick, max_volume);
+        max_Vgps = max_sensor_volume(slope_power_gps, panel_const, panel_thick, max_volume);
 
-        revenue_total = SatelliteRevenue(gps_vol,camera_vol,comms_vol,gps_vol_limit,camera_vol_limit,comms_vol_limit);
+        revenue_total = SatelliteRevenue(gps_vol,camera_vol,comms_vol,max_Vgps,max_Vcam,max_Vcomms);
         
         gps_weight = gps_vol*gps_density;
         camera_weight = camera_vol*camera_density;
@@ -107,8 +102,8 @@ function [xopt, fopt, exitflag, output] = optimize_satellite()
         costs_gps = gps_init_cost*gps_vol;
         costs_camera=camera_init_cost*camera_vol;
         costs_panel = panel_init_cost*panel_vol;
-        costs_fuel = RocketCosts(total_weight); %JHB mentioned he had this.
-        costs_total=costs_comms+costs_gps+costs_camera+costs_panel+costs_fuel;
+        costs_fuel = RocketCosts(total_weight); 
+        costs_total=costs_comms+costs_gps+costs_camera+costs_panel+costs_fuel
         
         net_profit=revenue_total-costs_total;
         
@@ -133,7 +128,7 @@ function [xopt, fopt, exitflag, output] = optimize_satellite()
         c(2)=-max_weight+total_weight;
         c(3)=-max_cost+costs_total;
         c(4)= power_camera+power_comms+power_gps-power_gen; % Power consumed <= power gen
-        
+        c
 %         f = revenue_total; 
         
         
@@ -148,6 +143,7 @@ function [xopt, fopt, exitflag, output] = optimize_satellite()
     
     xopt
     fopt
+    
 
     objcon(xopt)
     % ------------Separate obj/con (do not change)------------
