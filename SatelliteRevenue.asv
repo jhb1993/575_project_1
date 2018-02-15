@@ -32,7 +32,7 @@ total_gps_rev=NPV(gps_rev);
 
 %placeholder
 camera_rev=zeros(15,1);
-camera_rev(1) = 60*10^6-(60*10^6)^(-camera_vol/(camera_vol_limit*.6));
+camera_rev(1) = 60*10^6-(60*10^6)^(-camera_vol/(camera_vol_limit*.3));
 
 
 for i=2:length(camera_rev)

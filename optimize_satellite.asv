@@ -18,8 +18,8 @@ function [xopt, fopt, exitflag, output] = optimize_satellite()
     %   panel_vol- size of solar panels (m^3)
          % gps, cam, comms, panel
     x0 = [10;50;15;20];
-    ub = [50;100;150;40];
-    lb = [5;5;5;2];
+    ub = [50;100;30;40];
+    lb = [5;10;5;2];
 
     % ------------Linear constraints------------
     A = [];
@@ -56,19 +56,18 @@ function [xopt, fopt, exitflag, output] = optimize_satellite()
         %%
 		
         panel_thick = .05;       %Panel thickness in, guess (m).
-        %This value seems reasonable after looking at https://ntrs.nasa.gov/archive/nasa/casi.ntrs.nasa.gov/19710028154.pdf
-        
+                    %This v
         panel_const = .00338;   %Panel converstion from Hubble (m2/W) 
         
         
         
         %analysis functions
         
-        gps_density = 240;
-        camera_density = 285; %(kg/m^3) Hubble Space telescope weighs 11000 kilos and is approx. 13.3 m by 4 m.
-        comms_density = 200;
-        panel_density = 100; 
-        superstructure_density = 100; %Presumably, the volume of superstructure
+        gps_density = 1;
+        camera_density = 1.1;
+        comms_density = 1.3;
+        panel_density = 1.7; 
+        superstructure_density = 1; %Presumably, the volume of superstructure
         %necessary will depend on the volume of the cargo we are
         %transporting. This will be expressed as a density of
         %superstructure per volume. TBN
@@ -81,13 +80,8 @@ function [xopt, fopt, exitflag, output] = optimize_satellite()
         %%instance, I'm very concerned with how we will allocate power to
         %%the different modules. It seems like that could get complicated.
         %%TBN
-        
-        %Placeholders:
-        gps_vol_limit=1.542626329854172e+02/3;
-        camera_vol_limit=1.542626329854172e+02/3;
-        comms_vol_limit=1.542626329854172e+02/3;
 
-        revenue_total = SatelliteRevenue(gps_vol,camera_vol,comms_vol,gps_vol_limit,camera_vol_limit,comms_vol_limit);
+        revenue_total = SatelliteRevenue(gps_vol,camera_vol,comms_vol,panel_vol,max_volume);
         
         gps_weight = gps_vol*gps_density;
         camera_weight = camera_vol*camera_density;
@@ -108,7 +102,7 @@ function [xopt, fopt, exitflag, output] = optimize_satellite()
         
         
         
-        power_camera = 2*camera_vol;                    
+        power_camera = 2*camera_vol;
         power_comms = .0005*comms_vol^3-.0497*comms_vol^2+1.5122*comms_vol - .981;
         power_gps = -.0018*gps_vol^3+.0703*gps_vol^2-.1371*gps_vol+.8088;
         power_gen = panel_vol/(panel_thick*panel_const); %Power generated from Solar Panels (W)
