@@ -50,7 +50,7 @@ function [xopt, fopt, exitflag, output] = optimize_satellite()
         
         
         %% Placeholders:
-         max_volume=pi*r_fairing^2*h_cylinder+pi/3*r_fairing^2*h_cone;
+         max_volume=pi*r_fairing^2*h_cylinder+pi/3*r_fairing^2*h_cone; %154.26 m^3
          max_weight=8900; %Max payload cap from wiki (kg)
          max_cost=10^6;
         %%
@@ -59,7 +59,9 @@ function [xopt, fopt, exitflag, output] = optimize_satellite()
         %This value seems reasonable after looking at https://ntrs.nasa.gov/archive/nasa/casi.ntrs.nasa.gov/19710028154.pdf
         
         panel_const = .00338;   %Panel converstion from Hubble (m2/W) 
-        
+        slope_power_cam = 4000; %m^3/W
+        slope_power_comm = 1500; %m^3/W
+        slope_power_gps = 750; %m^3/W
         
         
         %analysis functions
@@ -86,6 +88,10 @@ function [xopt, fopt, exitflag, output] = optimize_satellite()
         gps_vol_limit=1.542626329854172e+02/3;
         camera_vol_limit=1.542626329854172e+02/3;
         comms_vol_limit=1.542626329854172e+02/3;
+        
+        max_Vcam = max_sensor_volume(slope_power_cam, panel_const, panel_thick, max_volume)
+        max_Vcomms = max_sensor_volume(slope_power_comm, panel_const, panel_thick, max_volume)
+        max_Vgps = max_sensor_volume(slope_power_gps, panel_const, panel_thick, max_volume)
 
         revenue_total = SatelliteRevenue(gps_vol,camera_vol,comms_vol,gps_vol_limit,camera_vol_limit,comms_vol_limit);
         
@@ -108,9 +114,9 @@ function [xopt, fopt, exitflag, output] = optimize_satellite()
         
         
         
-        power_camera = 2*camera_vol;                    
-        power_comms = .0005*comms_vol^3-.0497*comms_vol^2+1.5122*comms_vol - .981;
-        power_gps = -.0018*gps_vol^3+.0703*gps_vol^2-.1371*gps_vol+.8088;
+        power_camera = slope_power_cam*camera_vol;                    
+        power_comms = slope_power_comm*comms_vol;
+        power_gps = slope_power_gps*gps_vol;
         power_gen = panel_vol/(panel_thick*panel_const); %Power generated from Solar Panels (W)
         
         %objective function
