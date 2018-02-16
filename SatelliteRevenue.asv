@@ -81,7 +81,7 @@ end
 total_comms_rev=NPV(comms_rev);
 %% End of Comms section.
 
-total_science_rev = science_vol^1.5*comms_vol^(1)*gps_vol^(.5)*camera_vol^.5*1000;
+total_science_rev = science_vol*comms_vol*gps_vol*sqrt(camera_vol*1000;
 
 
 revenue=(total_gps_rev+total_camera_rev+total_comms_rev+total_science_rev);
