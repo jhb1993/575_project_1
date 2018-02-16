@@ -12,13 +12,13 @@ gps_rev=zeros(15,1);
 
 
 
-Kgps=3.125*10^7;
+Kgps=3.125*10^6;
 %Kgps=3.125*10^7;
 %K is the maximum revenue per year achievable by a GPS satellite.
 %It is estimated to be slightly above the current cost to the taxpayer.
 %http://nation.time.com/2012/05/21/how-much-does-gps-cost/
 
-Agps=(Kgps-90)/90;
+Agps=(Kgps-9)/9;
 %Agps=(Kgps-10^2)/10^2;                
 %A is a term based on K and the initial profits of any functional comms
 %satellite, which we estimate to be 10,000 per year.
@@ -43,7 +43,7 @@ total_gps_rev=NPV(gps_rev);
 
 %placeholder
 camera_rev=zeros(15,1);
-camera_rev(1) = 30*10^3*(12*camera_vol/(camera_vol_limit))^(4);
+camera_rev(1) = 30*10^2*(12*camera_vol/(camera_vol_limit))^(4);
 
 
 for i=2:length(camera_rev)
@@ -58,17 +58,17 @@ total_camera_rev=NPV(camera_rev);
 %%established) and then fall off as less additional benefit accrues as
 %%the sensor grows past the necessary volume.
 comms_rev=zeros(15,1);
-Kcomms=100*10^6;
+Kcomms=100*10^5;
 %K is the maximum revenue per year achievable by a communications satellite.
 %It is estimated as approx 100 million using this website.
 %https://www.sia.org/wp-content/uploads/2017/07/SIA-SSIR-2017.pdf
 
-Acomms=(Kcomms-10^3)/10^3;                
+Acomms=(Kcomms-10^2)/10^2;                
 %A is a term based on K and the initial profits of any functional comms
 %satellite, which we estimate to be 1,000 per year.
 kcomms = -1;
 %K is a scaling factor.
-norm_coms_vol=comms_vol/1.1;
+norm_coms_vol=comms_vol;
 %Unused
 
 comms_rev(1) = Kcomms/(1+Acomms*exp(kcomms*norm_coms_vol));    

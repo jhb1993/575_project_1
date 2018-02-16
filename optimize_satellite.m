@@ -38,10 +38,10 @@ function [xopt, fopt, exitflag, output] = optimize_satellite()
                
         
         %other analysis variables
-        gps_init_cost = 25000;     %analogous to manufacture cost ($/m^3)
-        camera_init_cost = 40000;  %analogous to manufacture cost ($/m^3)
-        comms_init_cost = 30000;   %analogous to manufacture cost ($/m^3)
-        panel_init_cost = 10000;   %This value has not been checked for rationality
+        gps_init_cost = 250000;     %analogous to manufacture cost ($/m^3)
+        camera_init_cost = 400000;  %analogous to manufacture cost ($/m^3)
+        comms_init_cost = 300000;   %analogous to manufacture cost ($/m^3)
+        panel_init_cost = 100000;   %This value has not been checked for rationality
         
         %payload fairing properties
         r_fairing = 4.572/2;    %radius from the Atlas V Payload fairing
@@ -52,7 +52,7 @@ function [xopt, fopt, exitflag, output] = optimize_satellite()
         %% Placeholders:
          max_volume=pi*r_fairing^2*h_cylinder+pi/3*r_fairing^2*h_cone; %154.26 m^3
          max_weight=8900; %Max payload cap from wiki (kg)
-         max_cost=10^7;
+         max_cost=10^8;
         %%
 		
         panel_thick = .05;       %Panel thickness in, guess (m).
