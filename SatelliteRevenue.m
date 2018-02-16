@@ -10,28 +10,29 @@ function [revenue] = SatelliteRevenue(gps_vol,camera_vol,comms_vol,gps_vol_limit
 %%one compared to the total volume of the craft).
 gps_rev=zeros(15,1);
 
-Kgps=31.25*10^6;
+Kgps=3.125*10^7;
 %K is the maximum revenue per year achievable by a GPS satellite.
-%It is estimated to be slightlya above the current cost to the taxpayer.
+%It is estimated to be slightly above the current cost to the taxpayer.
 %http://nation.time.com/2012/05/21/how-much-does-gps-cost/
 
 Agps=(Kgps-10^2)/10^2;                
 %A is a term based on K and the initial profits of any functional comms
 %satellite, which we estimate to be 10,000 per year.
-kgps = -40;
+kgps = -20;
 %K is a scaling factor.
 
 norm_gps_vol=gps_vol/(10);      %Current GPS satellites are approx 10m^3
                 %http://www.boeing.com/space/global-positioning-system/
 
 gps_rev(1) = Kgps/(1+Agps*exp(kgps*norm_gps_vol));
+
 for i=2:length(gps_rev)
     gps_rev(i)=gps_rev(1);
     %Value of the GPS array remains constant.
 end
 total_gps_rev=NPV(gps_rev);
 
-%% Camera revenues are presumed to have a quadratic growth pattern
+%% Camera revenues are presumed to have a cubic growth pattern
 %%(a larger camera is much better than a few smaller ones). 
 
 %placeholder

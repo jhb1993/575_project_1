@@ -8,12 +8,13 @@ function [cost] = RocketCosts(total_weight)
     liq_oxy_cost = 0.20;     %cost for liquid oxygen fuel ($/kg)
     h_oxy_ratio = 5.5;       %Hydrogen/oxygen ratio.
     i_sp = 450;              %specific impulse of fuel (s)
-    delta_v = 3070;          %necessary orbital velocity (m/s)
+    delta_v_leo = 9800;      %delta v from Earth to LEO orbit (m/s)
+    delta_v_geo = 4240;      %delta v from LEO to GEO orbit (m/s)
     mf = 46697+total_weight; %dry mass of Atlas V rocket and satellite(kg)
     g = 9.80665;             %acc. due to gravity at Earth's surface
     ve = i_sp*g;             %exhaust velocity of propellant
         
-    mo = mf*exp(delta_v/ve);    %total mass of rocket with propellant
+    mo = mf*exp(delta_v_leo/ve)*exp(delta_v_geo/ve);    %total mass of rocket with propellant
     
     mass_propellant = mo-mf;
     
