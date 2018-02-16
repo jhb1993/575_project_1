@@ -14,8 +14,7 @@ function [cost] = RocketCosts(total_weight)
     g = 9.80665;             %acc. due to gravity at Earth's surface
     ve = i_sp*g;             %exhaust velocity of propellant
         
-    mo = mf*exp(delta_v_leo/ve)*exp(delta_v_geo/ve);    %total mass of rocket with propellant
-    
+    mo = mf*exp(delta_v_leo/ve)*exp(delta_v_geo/ve);    %total mass of rocket with propellant   
     mass_propellant = mo-mf;
     
     mass_liq_oxy = mass_propellant/(h_oxy_ratio+1);

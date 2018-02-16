@@ -1,4 +1,4 @@
-function [revenue] = SatelliteRevenue(gps_vol,camera_vol,comms_vol,gps_vol_limit,camera_vol_limit,comms_vol_limit)
+function [revenue] = SatelliteRevenue(gps_vol,camera_vol,comms_vol,science_vol,gps_vol_limit,camera_vol_limit,comms_vol_limit)
 
 % %         Cameron's proposed valuations that I found after making these:
 % %         revenue_gps = sqrt(gps_vol);        %revenue from gps ($)
@@ -10,18 +10,24 @@ function [revenue] = SatelliteRevenue(gps_vol,camera_vol,comms_vol,gps_vol_limit
 %%one compared to the total volume of the craft).
 gps_rev=zeros(15,1);
 
+
+
 Kgps=3.125*10^7;
+%Kgps=3.125*10^7;
 %K is the maximum revenue per year achievable by a GPS satellite.
 %It is estimated to be slightly above the current cost to the taxpayer.
 %http://nation.time.com/2012/05/21/how-much-does-gps-cost/
 
-Agps=(Kgps-10^2)/10^2;                
+Agps=(Kgps-90)/90;
+%Agps=(Kgps-10^2)/10^2;                
 %A is a term based on K and the initial profits of any functional comms
 %satellite, which we estimate to be 10,000 per year.
-kgps = -20;
+
+kgps = -1;
+%kgps = -1;
 %K is a scaling factor.
 
-norm_gps_vol=gps_vol/(10);      %Current GPS satellites are approx 10m^3
+norm_gps_vol=gps_vol;      %Current GPS satellites are approx 10m^3
                 %http://www.boeing.com/space/global-positioning-system/
 
 gps_rev(1) = Kgps/(1+Agps*exp(kgps*norm_gps_vol));
@@ -37,11 +43,11 @@ total_gps_rev=NPV(gps_rev);
 
 %placeholder
 camera_rev=zeros(15,1);
-camera_rev(1) = 30*10^3*(5*camera_vol/(camera_vol_limit))^(3);
+camera_rev(1) = 30*10^3*(12*camera_vol/(camera_vol_limit))^(4);
 
 
 for i=2:length(camera_rev)
-    camera_rev(i)=camera_rev(1)*exp(-i*.15);
+    camera_rev(i)=camera_rev(1)*exp(-i*.35);
     %Value of the camera decays according to some function. This is just a
     %placeholder for Cameron's version of that function.
 end
@@ -57,13 +63,14 @@ Kcomms=100*10^6;
 %It is estimated as approx 100 million using this website.
 %https://www.sia.org/wp-content/uploads/2017/07/SIA-SSIR-2017.pdf
 
-Acomms=(Kcomms-10^2)/10^2;                
+Acomms=(Kcomms-10^3)/10^3;                
 %A is a term based on K and the initial profits of any functional comms
 %satellite, which we estimate to be 1,000 per year.
-kcomms = -10;
+kcomms = -1;
 %K is a scaling factor.
-norm_coms_vol=comms_vol/(35);
-%this normalizes the equation.
+norm_coms_vol=comms_vol/1.1;
+%Unused
+
 comms_rev(1) = Kcomms/(1+Acomms*exp(kcomms*norm_coms_vol));    
 %Find initial value for comms revenue.
 for i=2:length(comms_rev)
@@ -74,7 +81,10 @@ end
 total_comms_rev=NPV(comms_rev);
 %% End of Comms section.
 
-revenue=(total_gps_rev+total_camera_rev+total_comms_rev);
+total_science_rev = science_vol*100000;
+
+
+revenue=(total_gps_rev+total_camera_rev+total_comms_rev+total_science_rev);
 
 % % if (revenue>10^6)
 % %     disp 'check'

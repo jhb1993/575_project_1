@@ -17,9 +17,9 @@ function [xopt, fopt, exitflag, output] = optimize_satellite()
     %   comms_vol- size of communications equipment (m^3)
 
          % gps, cam, comms
-    x0 = [50;100;2];
+    x0 = [20;20;20;10];
     ub = [150;150;150];
-    lb = [1;1;1];
+    lb = [1;1;1;1];
 
     % ------------Linear constraints------------
     A = [];
@@ -34,6 +34,7 @@ function [xopt, fopt, exitflag, output] = optimize_satellite()
         gps_vol = x(1);
         camera_vol = x(2);
         comms_vol = x(3);
+        science_vol = x(4);
                
         
         %other analysis variables
@@ -77,6 +78,7 @@ function [xopt, fopt, exitflag, output] = optimize_satellite()
         camera_density = 170;   %(kg/m^3) Hubble Space telescope weighs 11000 kilos and is approx. 13.3 m by 5 m.
         comms_density = 160;    %(kg/m^3) Inmarsat-4 F3 guesses from https://www.satbeams.com/satellites?norad=33278 and pictures
         panel_density = 8;     %(kg/m^3) http://sunmetrix.com/is-my-roof-suitable-for-solar-panels-and-what-is-the-weight-of-a-solar-panel/
+        science_density = 25;    % a bald guess               
                         %This source is for roof-based panels, which will
                         %probably weigh a bit more than space panels.
         superstructure_density = 0; %Presumably, superstructure weight has
@@ -95,15 +97,16 @@ function [xopt, fopt, exitflag, output] = optimize_satellite()
         max_Vcomms = max_sensor_volume(slope_power_comm, panel_const, panel_thick, max_volume);
         max_Vgps = max_sensor_volume(slope_power_gps, panel_const, panel_thick, max_volume);
 
-        revenue_total = SatelliteRevenue(gps_vol,camera_vol,comms_vol,max_Vgps,max_Vcam,max_Vcomms);
+        revenue_total = SatelliteRevenue(gps_vol,camera_vol,comms_vol,science_vol,max_Vgps,max_Vcam,max_Vcomms);
         
         gps_weight = gps_vol*gps_density;
         camera_weight = camera_vol*camera_density;
         comms_weight = comms_vol*comms_density;
         panel_weight = panel_vol*panel_density; 
+        science_weight = science_vol*science_density;
         structure_weight = total_vol*superstructure_density;
         total_weight=gps_weight+camera_weight+comms_weight+panel_weight...
-            +structure_weight;
+            +science_weight+structure_weight;
         
         costs_comms = comms_init_cost*comms_vol;
         costs_gps = gps_init_cost*gps_vol;
@@ -111,6 +114,8 @@ function [xopt, fopt, exitflag, output] = optimize_satellite()
         costs_panel = panel_init_cost*panel_vol;
         costs_fuel = RocketCosts(total_weight); 
         costs_total=costs_comms+costs_gps+costs_camera+costs_panel+costs_fuel;
+        %Does science have an initial cost? I think no
+        
         
         net_profit=revenue_total-costs_total;
 
