@@ -36,7 +36,7 @@ for j=1:size(gps_vol,1)
     end
 end
 
-for i=2:size(gps_vol,3)
+for i=2:size(gps_rev,3)
     gps_rev(:,:,i)=gps_rev(:,:,1);
     %Value of the GPS array remains constant.
 end
@@ -58,7 +58,7 @@ for j=1:size(camera_vol,1)
     end
 end
 
-for i=2:length(camera_rev)
+for i=2:size(camera_rev,3)
     camera_rev(:,:,i)=camera_rev(:,:,1).*exp(-i.*.35);
     %Value of the camera decays according to some function. This is just a
     %placeholder for Cameron's version of that function.
@@ -88,11 +88,11 @@ norm_coms_vol=comms_vol;
 %Unused
 for j=1:size(comms_vol,1)
     for k=1:size(comms_vol,2)
-        comms_rev(1,1,1) = Kcomms./(1+Acomms.*exp(kcomms.*comms_vol(j,k)));  
+        comms_rev(j,k,1) = Kcomms./(1+Acomms.*exp(kcomms.*comms_vol(j,k)));  
     end
 end
 %Find initial value for comms revenue.
-for i=2:length(comms_rev)
+for i=2:size(comms_rev,3)
     comms_rev(:,:,i)=comms_rev(:,:,1).*exp(-i.*.05);
     %Value of the communications decays exponentially, reaching
     %approxiamtely half its original values in 15 years.

@@ -1,9 +1,9 @@
-[science_vol,gps_vol] = meshgrid(0:1:200,0:1:200);
+[science_vol,gps_vol] = meshgrid(0:.1:100,0:.1:100);
 
 camera_vol = 4.4996;
 comms_vol = 15.9956;
 
-gps_init_cost = 250000;     %analogous to manufacture cost ($/m^3)
+ gps_init_cost = 250000;     %analogous to manufacture cost ($/m^3)
 camera_init_cost = 400000;  %analogous to manufacture cost ($/m^3)
 comms_init_cost = 300000;   %analogous to manufacture cost ($/m^3)
 panel_init_cost = 100000;   %This value has not been checked for rationality
@@ -17,7 +17,7 @@ h_cone = 5.296;         %height from the Atlas V Payload fairing
 %% Placeholders:
 max_volume=pi.*r_fairing.^2.*h_cylinder+pi./3.*r_fairing.^2.*h_cone; %154.26 m.^3
 max_weight=8900; %Max payload cap from wiki (kg)
-max_cost=5*10.^7;
+max_cost=2*10.^7;
 %%
 
 panel_thick = .05;       %Panel thickness in, guess (m).
@@ -85,11 +85,11 @@ costs_total=costs_comms+costs_gps+costs_camera+costs_panel+costs_fuel;
 net_profit=revenue_total-costs_total;
 
 
-
-[C,h] = contour(science_vol,gps_vol,net_profit,'k');
+x = [5,6,7,8,9,10,12,15,20].*10^7;
+[C,h] = contour(science_vol,gps_vol,revenue_total,x,'k');
 clabel(C,h,'Labelspacing',250);
 % title('Spring Contour Plot', 'FontSize', 18);
-xlabel('Science Experiemnt Volume', 'FontSize', 20);
+xlabel('Science Experiment Volume', 'FontSize', 20);
 ylabel('GPS Volume', 'FontSize', 20);
 hold on;
 contour(science_vol,gps_vol,-max_volume+total_vol,[0,0],'g-','LineWidth',2);

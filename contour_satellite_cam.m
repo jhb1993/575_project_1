@@ -1,4 +1,4 @@
-[science_vol,camera_vol] = meshgrid(0:1:200,0:1:200);
+[science_vol,camera_vol] = meshgrid(0:.2:50,0:.2:50);
 
 gps_vol = 15.7011;
 comms_vol = 15.9956;
@@ -17,7 +17,7 @@ h_cone = 5.296;         %height from the Atlas V Payload fairing
 %% Placeholders:
 max_volume=pi.*r_fairing.^2.*h_cylinder+pi./3.*r_fairing.^2.*h_cone; %154.26 m.^3
 max_weight=8900; %Max payload cap from wiki (kg)
-max_cost=5*10.^7;
+max_cost=2*10.^7;
 %%
 
 panel_thick = .05;       %Panel thickness in, guess (m).
@@ -89,7 +89,7 @@ net_profit=revenue_total-costs_total;
 [C,h] = contour(science_vol,camera_vol,net_profit,'k');
 clabel(C,h,'Labelspacing',250);
 % title('Spring Contour Plot', 'FontSize', 18);
-xlabel('Science Experiemnt Volume', 'FontSize', 20);
+xlabel('Science Experiment Volume', 'FontSize', 20);
 ylabel('Camera Volume', 'FontSize', 20);
 hold on;
 contour(science_vol,camera_vol,-max_volume+total_vol,[0,0],'g-','LineWidth',2);
