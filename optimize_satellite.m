@@ -97,7 +97,7 @@ function [xopt, fopt, exitflag, output] = optimize_satellite()
         max_Vcomms = max_sensor_volume(slope_power_comm, panel_const, panel_thick, max_volume);
         max_Vgps = max_sensor_volume(slope_power_gps, panel_const, panel_thick, max_volume);
 
-        revenue_total = SatelliteRevenue(gps_vol,camera_vol,comms_vol,science_vol,max_Vgps,max_Vcam,max_Vcomms);
+        revenue_total = SatelliteRevenue(gps_vol,camera_vol,comms_vol,science_vol,max_Vgps,max_Vcam,max_Vcomms)
         
         gps_weight = gps_vol*gps_density;
         camera_weight = camera_vol*camera_density;
@@ -135,6 +135,8 @@ function [xopt, fopt, exitflag, output] = optimize_satellite()
         c(2)=-max_weight+total_weight;
         c(3)=-max_cost+costs_total;     
         c
+        total_weight
+        costs_total
         %equality constraints
         ceq = [];
 

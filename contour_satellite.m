@@ -1,4 +1,4 @@
-[science_vol,gps_vol] = meshgrid(0:.1:100,0:.1:100);
+[science_vol,gps_vol] = meshgrid(0:.1:100,0:.1:50);
 
 camera_vol = 4.4996;
 comms_vol = 15.9956;
@@ -85,7 +85,7 @@ costs_total=costs_comms+costs_gps+costs_camera+costs_panel+costs_fuel;
 net_profit=revenue_total-costs_total;
 
 
-x = [5,6,7,8,9,10,12,15,20].*10^7;
+x = [0,8,10,12,15,20,24].*10^7;
 [C,h] = contour(science_vol,gps_vol,revenue_total,x,'k');
 clabel(C,h,'Labelspacing',250);
 % title('Spring Contour Plot', 'FontSize', 18);
