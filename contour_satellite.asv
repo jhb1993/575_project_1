@@ -1,4 +1,4 @@
-[science_vol,gps_vol] = meshgrid(1:.1:35,1:.1:20);
+[science_vol,gps_vol] = meshgrid(15:.05:35,5:.05:30);
 
 camera_vol = 4.4996;
 comms_vol = 15.9956;
@@ -84,9 +84,7 @@ costs_total=costs_comms+costs_gps+costs_camera+costs_panel+costs_fuel;
 
 net_profit=revenue_total-costs_total;
 
-contour(science_vol,gps_vol,-max_volume+total_vol,[0,0],'g-','LineWidth',2);
-contour(science_vol,gps_vol,-max_weight+total_weight,[0,0],'g-','LineWidth',2);
-contour(science_vol,gps_vol,-max_costs+costs_total,[0,0],'g-','LineWidth',2);
+
 
 [C,h] = contour(science_vol,gps_vol,net_profit,'k');
 clabel(C,h,'Labelspacing',250);
@@ -94,7 +92,9 @@ clabel(C,h,'Labelspacing',250);
 xlabel('Science Experiemnt Volume', 'FontSize', 20);
 ylabel('GPS Volume', 'FontSize', 20);
 hold on;
-
+contour(science_vol,gps_vol,-max_volume+total_vol,[0,0],'g-','LineWidth',2);
+contour(science_vol,gps_vol,-max_weight+total_weight,[0,0],'b-','LineWidth',2);
+contour(science_vol,gps_vol,-max_cost+costs_total,[0,0],'r-','LineWidth',2);
 
 AX = legend('Net Profit','Volume','Weight','Costs');
 AX.FontSize = 16;

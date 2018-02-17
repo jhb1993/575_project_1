@@ -8,7 +8,7 @@ function [revenue] = SatelliteRevenue_mat(gps_vol,camera_vol,comms_vol,science_v
 %% GPS revenues are presumed to have a logistic growth pattern, where
 %%returns rapidly diminish beyond a certain level of volume (a fairly small
 %%one compared to the total volume of the craft).
-gps_rev=zeros(191,341,15);
+gps_rev=zeros(size(gps_vol,1),size(gps_vol,2),15);
 
 
 
@@ -30,19 +30,19 @@ kgps = -1;
 norm_gps_vol=gps_vol;      %Current GPS satellites are approx 10m^3
                 %http://www.boeing.com/space/global-positioning-system/
 
-for j=1:size(norm_gps_vol,1)
-    for k=1:size(norm_gps_vol,2)
-        gps_rev(j,k,1) = Kgps./(1+Agps.*exp(kgps.*norm_gps_vol(j,k)));
+for j=1:size(gps_vol,1)
+    for k=1:size(gps_vol,2)
+        gps_rev(j,k,1) = Kgps./(1+Agps.*exp(kgps.*gps_vol(j,k)));
     end
 end
 
-for i=2:size(norm_gps_vol,3)
+for i=2:size(gps_vol,3)
     gps_rev(:,:,i)=gps_rev(:,:,1);
     %Value of the GPS array remains constant.
 end
 
-for j=1:size(norm_gps_vol,1)
-    for k=1:size(norm_gps_vol,2)
+for j=1:size(gps_vol,1)
+    for k=1:size(gps_vol,2)
         total_gps_rev(j,k)=NPV_mat(gps_rev(j,k,:));
     end
 end
@@ -50,22 +50,30 @@ end
 %%(a larger camera is much better than a few smaller ones). 
 
 %placeholder
-camera_rev=zeros(15,1);
-camera_rev(1) = 30.*10.^2.*(12.*camera_vol./(camera_vol_limit)).^(4);
+camera_rev=zeros(size(camera_vol,1),size(camera_vol,2),15);
 
+for j=1:size(camera_vol,1)
+    for k=1:size(camera_vol,2)
+        camera_rev(j,k,1) = 30.*10.^2.*(12.*camera_vol(j,k)./(camera_vol_limit)).^(4);
+    end
+end
 
 for i=2:length(camera_rev)
-    camera_rev(i)=camera_rev(1).*exp(-i.*.35);
+    camera_rev(:,:,i)=camera_rev(:,:,1).*exp(-i.*.35);
     %Value of the camera decays according to some function. This is just a
     %placeholder for Cameron's version of that function.
 end
-total_camera_rev=NPV_mat(camera_rev);
+for j=1:size(camera_vol,1)
+    for k=1:size(camera_vol,2)
+        total_camera_rev(j,k)=NPV_mat(camera_rev(j,k,:));
+    end
+end
 
 %% Comms revenues are presumed to have a logistic growth pattern, where returns
 %%rapidly increase for some amount of volume (basic communications are
 %%established) and then fall off as less additional benefit accrues as
 %%the sensor grows past the necessary volume.
-comms_rev=zeros(15,1);
+comms_rev=zeros(size(comms_vol,1),size(comms_vol,2),15);
 Kcomms=100.*10.^5;
 %K is the maximum revenue per year achievable by a communications satellite.
 %It is estimated as approx 100 million using this website.
@@ -78,15 +86,23 @@ kcomms = -1;
 %K is a scaling factor.
 norm_coms_vol=comms_vol;
 %Unused
-
-comms_rev(1) = Kcomms./(1+Acomms.*exp(kcomms.*norm_coms_vol));    
+for j=1:size(comms_vol,1)
+    for k=1:size(comms_vol,2)
+        comms_rev(1,1,1) = Kcomms./(1+Acomms.*exp(kcomms.*comms_vol(j,k)));  
+    end
+end
 %Find initial value for comms revenue.
 for i=2:length(comms_rev)
-    comms_rev(i)=comms_rev(1).*exp(-i.*.05);
+    comms_rev(:,:,i)=comms_rev(:,:,1).*exp(-i.*.05);
     %Value of the communications decays exponentially, reaching
     %approxiamtely half its original values in 15 years.
 end
-total_comms_rev=NPV_mat(comms_rev);
+
+for j=1:size(comms_vol,1)
+    for k=1:size(comms_vol,2)
+        total_comms_rev(j,k)=NPV_mat(comms_rev(j,k,:));
+    end
+end
 %% End of Comms section.
 
 total_science_rev = science_vol.^1.5.*comms_vol.^(1).*gps_vol.^(.5).*camera_vol.^.5.*1000;

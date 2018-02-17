@@ -72,7 +72,7 @@ function [xopt, fopt, exitflag, output] = optimize_satellite()
         total_power = power_camera+power_comms+power_gps;
         panel_vol = total_power*panel_thick*panel_const;
         
-        total_vol=gps_vol+camera_vol+comms_vol+panel_vol;
+        total_vol=gps_vol+camera_vol+comms_vol+panel_vol+science_vol;
 
         gps_density = 163;      %(kg/m^3) http://www.boeing.com/space/global-positioning-system/
         camera_density = 170;   %(kg/m^3) Hubble Space telescope weighs 11000 kilos and is approx. 13.3 m by 5 m.

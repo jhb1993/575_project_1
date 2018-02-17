@@ -1,6 +1,6 @@
-[science_vol,gps_vol] = meshgrid(0:1:200,0:1:200);
+[science_vol,camera_vol] = meshgrid(0:1:200,0:1:200);
 
-camera_vol = 4.4996;
+gps_vol = 15.7011;
 comms_vol = 15.9956;
 
 gps_init_cost = 250000;     %analogous to manufacture cost ($/m^3)
@@ -86,15 +86,15 @@ net_profit=revenue_total-costs_total;
 
 
 
-[C,h] = contour(science_vol,gps_vol,net_profit,'k');
+[C,h] = contour(science_vol,camera_vol,net_profit,'k');
 clabel(C,h,'Labelspacing',250);
 % title('Spring Contour Plot', 'FontSize', 18);
 xlabel('Science Experiemnt Volume', 'FontSize', 20);
-ylabel('GPS Volume', 'FontSize', 20);
+ylabel('Camera Volume', 'FontSize', 20);
 hold on;
-contour(science_vol,gps_vol,-max_volume+total_vol,[0,0],'g-','LineWidth',2);
-contour(science_vol,gps_vol,-max_weight+total_weight,[0,0],'b-','LineWidth',2);
-contour(science_vol,gps_vol,-max_cost+costs_total,[0,0],'r-','LineWidth',2);
+contour(science_vol,camera_vol,-max_volume+total_vol,[0,0],'g-','LineWidth',2);
+contour(science_vol,camera_vol,-max_weight+total_weight,[0,0],'b-','LineWidth',2);
+contour(science_vol,camera_vol,-max_cost+costs_total,[0,0],'r-','LineWidth',2);
 
 AX = legend('Net Profit','Volume','Weight','Costs');
 AX.FontSize = 16;
